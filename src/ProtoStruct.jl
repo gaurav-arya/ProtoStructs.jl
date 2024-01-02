@@ -228,6 +228,18 @@ macro proto(expr)
                         print(io, string($name, "{", join(params, ", "), "}"), "($vals)")
                     end
                 end
+
+                function $(ConstructionBase).setproperties(o::$name, patch::NamedTuple)
+                    nt = $(ConstructionBase).getproperties(o) 
+                    nt_new = merge(nt, patch)
+                    if keys(nt) != keys(nt_new)
+                        msg = """
+                        Failed to assign properties $(propertynames(patch)) to object with properties $(propertynames(o)).
+                        """
+                        throw(ArgumentError(msg)) 
+                    end
+                    return $(ConstructionBase).constructorof($name)(nt_new...)
+                end
             end
         end
     return esc(ex)
